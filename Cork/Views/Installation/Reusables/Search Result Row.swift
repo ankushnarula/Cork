@@ -17,7 +17,7 @@ struct SearchResultRow: View, Sendable
 
     @Environment(BrewPackagesTracker.self) var brewPackagesTracker: BrewPackagesTracker
 
-    let searchedForPackage: BrewPackage
+    let searchedForPackage: MinimalHomebrewPackage
     let context: Self.Context
     
     @State private var description: String?
@@ -114,7 +114,7 @@ struct SearchResultRow: View, Sendable
         {
             if showDescriptionsInSearchResults
             {
-                AppConstants.shared.logger.info("\(searchedForPackage.name(withPrecision: .precise), privacy: .auto) came into view")
+                AppConstants.shared.logger.info("\(searchedForPackage.name, privacy: .auto) came into view")
 
                 if description == nil
                 {
@@ -123,23 +123,18 @@ struct SearchResultRow: View, Sendable
                         isLoadingDescription = false
                     }
 
-                    AppConstants.shared.logger.info("\(searchedForPackage.name(withPrecision: .precise), privacy: .auto) does not have its description loaded")
+                    AppConstants.shared.logger.info("\(searchedForPackage.name, privacy: .auto) does not have its description loaded")
 
                     do
                     {
-                        let searchedForPackage: BrewPackage = .init(
-                            rawName: searchedForPackage.name(withPrecision: .precise),
-                            type: searchedForPackage.type,
-                            installedOn: Date(),
-                            versions: [],
-                            url: nil,
-                            sizeInBytes: nil,
-                            downloadCount: nil
-                        )
+                        guard let searchedForPackageConvertedForDetailLoading: BrewPackage = .init(using: searchedForPackage) else
+                        {
+                            AppConstants.shared.logger.error("Failed to convert minimal package to actual package")
+                        }
 
                         do
                         {
-                            let parsedPackageInfo: BrewPackage.BrewPackageDetails = try await searchedForPackage.loadDetails()
+                            let parsedPackageInfo: BrewPackage.BrewPackageDetails = try await searchedForPackageConvertedForDetailLoading.loadDetails()
 
                             description = parsedPackageInfo.description
 

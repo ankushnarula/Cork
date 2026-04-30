@@ -20,12 +20,11 @@ import CorkTerminalFunctions
 public typealias BrewPackages = Set<Result<BrewPackage, BrewPackage.PackageLoadingError>>
 
 /// A representation of a Homebrew package
-public struct BrewPackage: Identifiable, Equatable, Hashable, Codable, Sendable, Modifiable
-{
+public struct BrewPackage: Identifiable, Equatable, Hashable, Codable, Sendable, Modifiable, PackageNameDisplayable
+{    
     /// The package's name parsed into chunks
     public struct BrewPackageName: Equatable, Hashable, Codable, Sendable
     {
-        
         public init(from unparsedName: String)
         {
             let packageNameWithoutTap: String =
@@ -139,7 +138,7 @@ public struct BrewPackage: Identifiable, Equatable, Hashable, Codable, Sendable,
     }
     
     public var id: UUID
-    private let internalName: BrewPackageName
+    public var internalName: BrewPackageName
 
     public let type: PackageType
     public var isTagged: Bool = false
@@ -241,23 +240,6 @@ public struct BrewPackage: Identifiable, Equatable, Hashable, Codable, Sendable,
         
         /// Includes the base name and the bound version, if one exists
         case precise
-    }
-    
-    /// Get a formatted version of the package's name
-    public func name(withPrecision precision: NameRetrievalPrecision) -> String
-    {
-        switch precision
-        {
-        case .general:
-            return self.internalName.packageIdentifier
-        case .precise:
-            guard let boundVersionUnwrapped = internalName.boundVersion else
-            {
-                return self.internalName.packageIdentifier
-            }
-            
-            return "\(self.internalName.packageIdentifier)@\(boundVersionUnwrapped)"
-        }
     }
     
     /// Get the whole package name struct

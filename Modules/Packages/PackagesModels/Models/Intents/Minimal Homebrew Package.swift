@@ -59,6 +59,15 @@ public extension MinimalHomebrewPackage
     }
 }
 
+public extension MinimalHomebrewPackage
+{
+    /// Initialize an empty minimal package, for when we don't care what it is
+    init(createEmpty: Bool)
+    {
+        self.init(name: "", type: .formula, installedIntentionally: false)
+    }
+}
+
 public struct MinimalHomebrewPackageIntentQuery: EntityQuery
 {
     public func entities(for _: [UUID]) async throws -> [MinimalHomebrewPackage]
