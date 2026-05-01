@@ -8,11 +8,11 @@
 import AppIntents
 import Foundation
 
-public struct MinimalHomebrewPackage: Identifiable, Hashable, AppEntity, Codable
+public struct MinimalHomebrewPackage: Identifiable, Hashable, AppEntity, Codable, PackageNameDisplayable
 {
     public init(name: String, type: BrewPackage.PackageType, installDate: Date? = nil, installedIntentionally: Bool) {
         self.id = .init()
-        self.name = name
+        self.internalName = .init(from: name)
         self.type = type
         self.installDate = installDate
         self.installedIntentionally = installedIntentionally
@@ -20,7 +20,7 @@ public struct MinimalHomebrewPackage: Identifiable, Hashable, AppEntity, Codable
     
     public var id: UUID
 
-    public var name: String
+    public var internalName: BrewPackageName
 
     public var type: BrewPackage.PackageType
 
