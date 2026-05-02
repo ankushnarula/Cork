@@ -16,6 +16,7 @@ struct SearchResultRow: View, Sendable
     @Default(.showCompatibilityWarning) var showCompatibilityWarning: Bool
 
     @Environment(BrewPackagesTracker.self) var brewPackagesTracker: BrewPackagesTracker
+    @Environment(TopPackagesTracker.self) var topPackagesTracker: TopPackagesTracker
 
     let searchedForPackage: MinimalHomebrewPackage
     let context: Self.Context
@@ -39,24 +40,27 @@ struct SearchResultRow: View, Sendable
                 case .topPackages:
                     Spacer()
                     
+                    // TODO: Reimplement download counts
+                    /*
                     if let downloadCount = searchedForPackage.downloadCount
                     {
                         Text("add-package.top-packages.list-item-\(downloadCount)")
                             .foregroundStyle(.secondary)
                             .font(.caption)
                     }
+                     */
                     
                 case .searchResults:
                     if searchedForPackage.type == .formula
                     {
-                        if brewPackagesTracker.successfullyLoadedFormulae.contains(where: { $0.getCompletePackageName() == searchedForPackage.getCompletePackageName() })
+                        if brewPackagesTracker.successfullyLoadedFormulae.contains(where: { $0.getCompletePackageName() == searchedForPackage.internalName })
                         {
                             PillTextWithLocalizableText(localizedText: "add-package.result.already-installed")
                         }
                     }
                     else
                     {
-                        if brewPackagesTracker.successfullyLoadedCasks.contains(where: { $0.getCompletePackageName() == searchedForPackage.getCompletePackageName() })
+                        if brewPackagesTracker.successfullyLoadedCasks.contains(where: { $0.getCompletePackageName() == searchedForPackage.internalName })
                         {
                             PillTextWithLocalizableText(localizedText: "add-package.result.already-installed")
                         }
@@ -114,7 +118,7 @@ struct SearchResultRow: View, Sendable
         {
             if showDescriptionsInSearchResults
             {
-                AppConstants.shared.logger.info("\(searchedForPackage.name, privacy: .auto) came into view")
+                AppConstants.shared.logger.info("\(searchedForPackage.name(withPrecision: .precise), privacy: .auto) came into view")
 
                 if description == nil
                 {
@@ -123,13 +127,15 @@ struct SearchResultRow: View, Sendable
                         isLoadingDescription = false
                     }
 
-                    AppConstants.shared.logger.info("\(searchedForPackage.name, privacy: .auto) does not have its description loaded")
+                    AppConstants.shared.logger.info("\(searchedForPackage.name(withPrecision: .precise), privacy: .auto) does not have its description loaded")
 
                     do
                     {
                         guard let searchedForPackageConvertedForDetailLoading: BrewPackage = .init(using: searchedForPackage) else
                         {
                             AppConstants.shared.logger.error("Failed to convert minimal package to actual package")
+                            
+                            return
                         }
 
                         do

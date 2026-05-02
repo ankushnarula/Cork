@@ -398,7 +398,7 @@ public extension BrewPackage
         guard let minimalPackage = minimalPackage else { return nil }
 
         self.init(
-            rawName: minimalPackage.name,
+            rawName: minimalPackage.name(withPrecision: .precise),
             type: minimalPackage.type,
             installedOn: minimalPackage.installDate,
             versions: [],

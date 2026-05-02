@@ -10,12 +10,23 @@ import Foundation
 
 public struct MinimalHomebrewPackage: Identifiable, Hashable, AppEntity, Codable, PackageNameDisplayable
 {
+    /// Initialize from an unparsed name
     public init(name: String, type: BrewPackage.PackageType, installDate: Date? = nil, installedIntentionally: Bool) {
         self.id = .init()
         self.internalName = .init(from: name)
         self.type = type
         self.installDate = installDate
         self.installedIntentionally = installedIntentionally
+    }
+    
+    /// Initialize from a full package
+    public init(fromFullPackage fullPackage: BrewPackage)
+    {
+        self.id = .init()
+        self.internalName = fullPackage.internalName
+        self.type = fullPackage.type
+        self.installDate = fullPackage.installedOn
+        self.installedIntentionally = fullPackage.installedIntentionally
     }
     
     public var id: UUID
@@ -33,7 +44,7 @@ public struct MinimalHomebrewPackage: Identifiable, Hashable, AppEntity, Codable
     public var displayRepresentation: DisplayRepresentation
     {
         DisplayRepresentation(
-            title: "\(name)",
+            title: "\(name(withPrecision: .precise))",
             subtitle: "intents.type.minimal-homebrew-package.representation.subtitle"
         )
     }

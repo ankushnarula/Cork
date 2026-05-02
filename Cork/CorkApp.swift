@@ -297,7 +297,7 @@ struct CorkApp: App
             let convertedMinimalPackage: BrewPackage? = BrewPackage(using: packageToPreview)
             
             PackagePreview(packageToPreview: convertedMinimalPackage)
-                .navigationTitle(packageToPreview?.name ?? "")
+                .navigationTitle(packageToPreview?.name(withPrecision: .precise) ?? "")
                 .environment(appState)
                 .environment(brewPackagesTracker)
                 .environment(outdatedPackagesTracker)
