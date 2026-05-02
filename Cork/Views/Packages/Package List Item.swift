@@ -70,13 +70,8 @@ struct PackageListItem: View
                             .transition(.scale)
                     }
 
-                    SanitizedPackageName(package: packageItem, shouldShowVersion: false)
-                }
-
-                Text(packageItem.getFormattedVersions())
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .layoutPriority(-Double(2))
+                    packageItem.nameView(withComponents: .boundVersion, .installedVersions(packageItem.versions))
+                }                    
 
                 if packageItem.isBeingModified
                 {
